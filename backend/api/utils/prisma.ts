@@ -1,29 +1,44 @@
 import { PrismaClient } from '../../generated/prisma/client';
+import { PrismaBetterSqlite3 } from '@prisma/adapter-better-sqlite3';
+
+// Get the database path from DATABASE_URL or use default
+const getDatabasePath = () => {
+  const dbUrl = process.env.DATABASE_URL;
+  if (dbUrl && dbUrl.startsWith('file:')) {
+    return dbUrl.replace('file:', '');
+  }
+  // Default path
+  return './prisma/dev.db';
+};
 
 // Singleton pattern for Prisma Client
 // This ensures we only have one database connection instance
 const prismaClientSingleton = () => {
-  // For Prisma 7, you need either accelerateUrl OR adapter
-  // For direct SQLite connection, we'll use an empty accelerateUrl as a workaround
-  // In production with Accelerate, set PRISMA_ACCELERATE_URL environment variable
   const accelerateUrl = process.env.PRISMA_ACCELERATE_URL;
   
+  const logLevels: ('query' | 'info' | 'warn' | 'error')[] = 
+    process.env.NODE_ENV === 'development' 
+      ? ['query', 'info', 'warn', 'error']
+      : ['error'];
+
   if (accelerateUrl) {
     // Using Prisma Accelerate
     return new PrismaClient({
       accelerateUrl,
-      log: process.env.NODE_ENV === 'development' ? ['query', 'info', 'warn', 'error'] : ['error'],
+      log: logLevels,
       errorFormat: 'pretty',
     });
   } else {
-    // Direct connection - Prisma 7 requires accelerateUrl or adapter
-    // Using empty string as workaround for direct SQLite connection
-    // TODO: Consider installing @prisma/adapter-sqlite for proper adapter support
+    // Direct SQLite connection using better-sqlite3 adapter
+    const adapter = new PrismaBetterSqlite3({
+      url: getDatabasePath(),
+    });
+    
     return new PrismaClient({
-      accelerateUrl: '', // Empty string for direct connection workaround
-      log: process.env.NODE_ENV === 'development' ? ['query', 'info', 'warn', 'error'] : ['error'],
+      adapter,
+      log: logLevels,
       errorFormat: 'pretty',
-    } as any);
+    });
   }
 };
 

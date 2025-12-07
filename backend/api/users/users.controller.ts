@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import * as usersService from './users.service';
 import bcrypt from 'bcrypt';
+import prisma from '../utils/prisma';
 
 declare global {
   namespace Express {

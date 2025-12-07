@@ -89,3 +89,27 @@ export const isPasswordCorrect = async (plainPassword: string, hashedPassword: s
   }
   return await bcrypt.compare(plainPassword, hashedPassword);
 };
+
+// Create a new user
+export const createUser = async (data: { username: string; email: string; password: string }) => {
+  // Hash password
+  const hashedPassword = await bcrypt.hash(data.password, 10);
+
+  // Create user
+  const user = await prisma.user.create({
+    data: {
+      username: data.username,
+      email: data.email,
+      password: hashedPassword,
+    },
+    select: {
+      id: true,
+      username: true,
+      email: true,
+      createdAt: true,
+      updatedAt: true,
+    },
+  });
+
+  return user;
+};
