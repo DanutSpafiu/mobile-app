@@ -2,6 +2,14 @@ import { Request, Response } from 'express';
 import * as usersService from './users.service';
 import bcrypt from 'bcrypt';
 
+declare global {
+  namespace Express {
+    interface Request {
+      user?: { id: string };
+    }
+  }
+}
+
 // GET /api/users - Get all users (protected route, typically for admin)
 export const getAllUsers = async (req: Request, res: Response) => {
   try {
