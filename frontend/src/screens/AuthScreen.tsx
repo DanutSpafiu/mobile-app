@@ -9,17 +9,24 @@ import {
   Platform,
   ScrollView,
   Alert,
+  ActivityIndicator,
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-export default function AuthScreen() {
+interface AuthScreenProps {
+  onLoginSuccess: () => void;
+}
+
+export default function AuthScreen({ onLoginSuccess }: AuthScreenProps) {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [username, setUsername] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
-  const API_URL = "http://localhost:3000";
+  const API_URL = "https://interestuarine-tragically-karl.ngrok-free.dev";
 
   const handleSubmit = async () => {
     if (isLogin) {
@@ -28,10 +35,41 @@ export default function AuthScreen() {
         Alert.alert("Error", "Please fill in all fields");
         return;
       }
-      console.log("Login:", { email, password });
-      // TODO: Implement login logic
 
-      Alert.alert("Success", "Login successful!");
+      setIsLoading(true);
+      try {
+        const response = await fetch(`${API_URL}/api/auth/login`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email,
+            password,
+          }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          const message = data?.error || "Failed to login";
+          Alert.alert("Error", message);
+          return;
+        }
+
+        // Store token and user data
+        await AsyncStorage.setItem("token", data.token);
+        await AsyncStorage.setItem("user", JSON.stringify(data.user));
+
+        Alert.alert("Success", "Login successful!");
+        // Navigate to WelcomeScreen
+        onLoginSuccess();
+      } catch (error) {
+        console.error("Login error:", error);
+        Alert.alert("Error", "Something went wrong. Please try again.");
+      } finally {
+        setIsLoading(false);
+      }
     } else {
       // Handle sign up
       if (!email || !password || !confirmPassword || !username) {
@@ -46,8 +84,9 @@ export default function AuthScreen() {
         Alert.alert("Error", "Password must be at least 6 characters");
         return;
       }
+      setIsLoading(true);
       try {
-        const response = await fetch(`https://interestuarine-tragically-karl.ngrok-free.dev/api/auth/register`, {
+        const response = await fetch(`${API_URL}/api/auth/register`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -67,12 +106,18 @@ export default function AuthScreen() {
           return;
         }
 
+        // Store token and user data after registration
+        await AsyncStorage.setItem("token", data.token);
+        await AsyncStorage.setItem("user", JSON.stringify(data.user));
+
         Alert.alert("Success", "Account created successfully!");
-        // Optional: move back to login mode after successful sign up
-        setIsLogin(true);
+        // Navigate to WelcomeScreen after successful registration
+        onLoginSuccess();
       } catch (error) {
         console.error("Sign up error:", error);
         Alert.alert("Error", "Something went wrong. Please try again.");
+      } finally {
+        setIsLoading(false);
       }
     }
   };
@@ -166,12 +211,20 @@ export default function AuthScreen() {
             )}
 
             <TouchableOpacity
-              style={styles.submitButton}
+              style={[
+                styles.submitButton,
+                isLoading && styles.submitButtonDisabled,
+              ]}
               onPress={handleSubmit}
+              disabled={isLoading}
             >
-              <Text style={styles.submitButtonText}>
-                {isLogin ? "Sign In" : "Sign Up"}
-              </Text>
+              {isLoading ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                <Text style={styles.submitButtonText}>
+                  {isLogin ? "Sign In" : "Sign Up"}
+                </Text>
+              )}
             </TouchableOpacity>
           </View>
 
@@ -262,6 +315,9 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 18,
     fontWeight: "600",
+  },
+  submitButtonDisabled: {
+    opacity: 0.6,
   },
   toggleContainer: {
     flexDirection: "row",
