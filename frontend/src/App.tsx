@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, ActivityIndicator, StyleSheet } from "react-native";
+import { View, ActivityIndicator, StyleSheet, Text } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import AuthScreen from "./screens/AuthScreen";
 import WelcomeScreen from "./screens/WelcomeScreen";
@@ -36,7 +36,12 @@ export default function App() {
   if (isLoading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#007AFF" />
+        <Text style={styles.loadingEmoji}>🎄</Text>
+        <ActivityIndicator
+          size="large"
+          color="#FFD700"
+          style={{ marginTop: 20 }}
+        />
       </View>
     );
   }
@@ -53,6 +58,9 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#f5f5f5",
+    backgroundColor: "#1a1a2e", // Deep dark blue-purple base
+  },
+  loadingEmoji: {
+    fontSize: 64,
   },
 });

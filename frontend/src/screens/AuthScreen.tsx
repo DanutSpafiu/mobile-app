@@ -61,7 +61,6 @@ export default function AuthScreen({ onLoginSuccess }: AuthScreenProps) {
         await AsyncStorage.setItem("token", data.token);
         await AsyncStorage.setItem("user", JSON.stringify(data.user));
 
-        Alert.alert("Success", "Login successful!");
         // Navigate to WelcomeScreen
         onLoginSuccess();
       } catch (error) {
@@ -127,7 +126,7 @@ export default function AuthScreen({ onLoginSuccess }: AuthScreenProps) {
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={styles.container}
     >
-      <StatusBar style="dark" />
+      <StatusBar style="light" />
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
@@ -135,11 +134,14 @@ export default function AuthScreen({ onLoginSuccess }: AuthScreenProps) {
         <View style={styles.content}>
           {/* Header */}
           <View style={styles.header}>
+            <Text style={styles.emoji}>🎄</Text>
             <Text style={styles.title}>
-              {isLogin ? "Welcome Back" : "Create Account"}
+              {isLogin ? "Welcome Back!" : "Create Your Account"}
             </Text>
             <Text style={styles.subtitle}>
-              {isLogin ? "Sign in to continue" : "Sign up to get started"}
+              {isLogin
+                ? "✨ Sign in to decorate your tree ✨"
+                : "🌟 Join the festive fun! 🌟"}
             </Text>
           </View>
 
@@ -250,7 +252,7 @@ export default function AuthScreen({ onLoginSuccess }: AuthScreenProps) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f5f5f5",
+    backgroundColor: "#1a1a2e", // Deep dark blue-purple base
   },
   scrollContent: {
     flexGrow: 1,
@@ -259,78 +261,119 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 24,
     justifyContent: "center",
+    backgroundColor: "transparent",
   },
   header: {
     marginBottom: 40,
     alignItems: "center",
   },
+  emoji: {
+    fontSize: 64,
+    marginBottom: 16,
+  },
   title: {
-    fontSize: 32,
+    fontSize: 36,
     fontWeight: "bold",
-    color: "#333",
-    marginBottom: 8,
+    color: "#FFD700", // Gold
+    marginBottom: 12,
+    textAlign: "center",
+    textShadowColor: "rgba(255, 215, 0, 0.5)",
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: 10,
+    letterSpacing: 1,
   },
   subtitle: {
     fontSize: 16,
-    color: "#666",
+    color: "#E8D5B7", // Warm cream
+    textAlign: "center",
+    lineHeight: 22,
   },
   form: {
     width: "100%",
+    backgroundColor: "rgba(139, 0, 0, 0.3)", // Semi-transparent deep red
+    borderRadius: 24,
+    padding: 24,
+    borderWidth: 2,
+    borderColor: "rgba(212, 175, 55, 0.3)", // Gold border
+    shadowColor: "#D4AF37",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 12,
+    elevation: 8,
   },
   inputContainer: {
     marginBottom: 20,
   },
   label: {
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: "600",
-    color: "#333",
+    color: "#FFD700", // Gold
     marginBottom: 8,
+    marginLeft: 4,
   },
   input: {
-    backgroundColor: "#fff",
-    borderRadius: 12,
+    backgroundColor: "rgba(255, 255, 255, 0.95)",
+    borderRadius: 16,
     padding: 16,
     fontSize: 16,
-    color: "#333",
-    borderWidth: 1,
-    borderColor: "#e0e0e0",
+    color: "#1a1a2e",
+    borderWidth: 2,
+    borderColor: "rgba(212, 175, 55, 0.4)", // Gold border
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   forgotPassword: {
     alignSelf: "flex-end",
     marginBottom: 24,
+    marginTop: 8,
   },
   forgotPasswordText: {
     fontSize: 14,
-    color: "#007AFF",
+    color: "#E8D5B7", // Warm cream
     fontWeight: "600",
+    textDecorationLine: "underline",
   },
   submitButton: {
-    backgroundColor: "#007AFF",
-    borderRadius: 12,
-    padding: 16,
+    backgroundColor: "#C41E3A", // Deep red
+    borderRadius: 20,
+    padding: 18,
     alignItems: "center",
     marginTop: 8,
+    borderWidth: 2,
+    borderColor: "#FFD700", // Gold border
+    shadowColor: "#C41E3A",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.4,
+    shadowRadius: 8,
+    elevation: 6,
   },
   submitButtonText: {
-    color: "#fff",
+    color: "#FFD700", // Gold text
     fontSize: 18,
-    fontWeight: "600",
+    fontWeight: "700",
+    letterSpacing: 1,
   },
   submitButtonDisabled: {
-    opacity: 0.6,
+    opacity: 0.5,
   },
   toggleContainer: {
     flexDirection: "row",
     justifyContent: "center",
     marginTop: 32,
+    flexWrap: "wrap",
   },
   toggleText: {
     fontSize: 14,
-    color: "#666",
+    color: "#E8D5B7", // Warm cream
   },
   toggleLink: {
     fontSize: 14,
-    color: "#007AFF",
-    fontWeight: "600",
+    color: "#FFD700", // Gold
+    fontWeight: "700",
+    textDecorationLine: "underline",
+    marginLeft: 4,
   },
 });
