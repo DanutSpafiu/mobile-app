@@ -1,20 +1,83 @@
-import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
-import React from "react";
+import { StyleSheet, Text, View, TouchableOpacity, Image } from "react-native";
+import React, { useState, useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import ProfileScreen from "./ProfileScreen";
 
 interface WelcomeScreenProps {
   onLogout: () => void;
 }
 
+interface ProfileData {
+  username: string;
+  email: string;
+  profilePicture: string | null;
+}
+
 const WelcomeScreen = ({ onLogout }: WelcomeScreenProps) => {
+  const [showProfile, setShowProfile] = useState(false);
+  const [profileData, setProfileData] = useState<ProfileData | null>(null);
+
+  useEffect(() => {
+    loadProfile();
+  }, []);
+
+  const loadProfile = async () => {
+    try {
+      const userStr = await AsyncStorage.getItem("user");
+      const profileStr = await AsyncStorage.getItem("profile");
+
+      if (profileStr) {
+        const profile = JSON.parse(profileStr);
+        setProfileData(profile);
+      } else if (userStr) {
+        const user = JSON.parse(userStr);
+        setProfileData({
+          username: user.username || "",
+          email: user.email || "",
+          profilePicture: null,
+        });
+      }
+    } catch (error) {
+      console.error("Error loading profile:", error);
+    }
+  };
+
+  const handleProfileClose = () => {
+    setShowProfile(false);
+    loadProfile(); // Reload profile after closing
+  };
+
   const handleLogout = async () => {
     await AsyncStorage.removeItem("token");
     await AsyncStorage.removeItem("user");
+    await AsyncStorage.removeItem("profile");
     onLogout();
   };
 
+  if (showProfile) {
+    return <ProfileScreen onClose={handleProfileClose} />;
+  }
+
   return (
     <View style={styles.container}>
+      {/* Profile Button in Upper Right */}
+      <TouchableOpacity
+        style={styles.profileButton}
+        onPress={() => setShowProfile(true)}
+      >
+        {profileData?.profilePicture ? (
+          <Image
+            source={{ uri: profileData.profilePicture }}
+            style={styles.profileButtonImage}
+          />
+        ) : (
+          <View style={styles.profileButtonPlaceholder}>
+            <Text style={styles.profileButtonPlaceholderText}>👤</Text>
+          </View>
+        )}
+        <View style={styles.profileButtonBorder} />
+      </TouchableOpacity>
+
       <View style={styles.content}>
         <Text style={styles.emoji}>🎄✨</Text>
         <Text style={styles.title}>Welcome to Your</Text>
@@ -45,6 +108,48 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#1a1a2e", // Deep dark blue-purple base
     padding: 24,
+  },
+  profileButton: {
+    position: "absolute",
+    top: 50,
+    right: 24,
+    zIndex: 10,
+    width: 56,
+    height: 56,
+  },
+  profileButtonImage: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    borderWidth: 3,
+    borderColor: "#FFD700",
+  },
+  profileButtonPlaceholder: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: "rgba(212, 175, 55, 0.3)",
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 3,
+    borderColor: "#FFD700",
+  },
+  profileButtonPlaceholderText: {
+    fontSize: 28,
+  },
+  profileButtonBorder: {
+    position: "absolute",
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    borderWidth: 2,
+    borderColor: "#C41E3A",
+    top: -2,
+    left: -2,
+    shadowColor: "#FFD700",
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.6,
+    shadowRadius: 8,
   },
   content: {
     flex: 1,
