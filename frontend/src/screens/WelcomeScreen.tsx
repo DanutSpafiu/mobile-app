@@ -2,6 +2,7 @@ import { StyleSheet, Text, View, TouchableOpacity, Image } from "react-native";
 import React, { useState, useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import ProfileScreen from "./ProfileScreen";
+import GlobeDesignerScreen from "./GlobeDesignerScreen";
 
 interface WelcomeScreenProps {
   onLogout: () => void;
@@ -15,6 +16,7 @@ interface ProfileData {
 
 const WelcomeScreen = ({ onLogout }: WelcomeScreenProps) => {
   const [showProfile, setShowProfile] = useState(false);
+  const [showGlobeDesigner, setShowGlobeDesigner] = useState(false);
   const [profileData, setProfileData] = useState<ProfileData | null>(null);
 
   useEffect(() => {
@@ -58,6 +60,10 @@ const WelcomeScreen = ({ onLogout }: WelcomeScreenProps) => {
     return <ProfileScreen onClose={handleProfileClose} />;
   }
 
+  if (showGlobeDesigner) {
+    return <GlobeDesignerScreen onBack={() => setShowGlobeDesigner(false)} />;
+  }
+
   return (
     <View style={styles.container}>
       {/* Profile Button in Upper Right */}
@@ -88,7 +94,10 @@ const WelcomeScreen = ({ onLogout }: WelcomeScreenProps) => {
         <Text style={styles.sparkle}>✨ 🌟 ✨</Text>
 
         <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.decorateButton}>
+          <TouchableOpacity
+            style={styles.decorateButton}
+            onPress={() => setShowGlobeDesigner(true)}
+          >
             <Text style={styles.decorateButtonText}>🎨 Start Decorating</Text>
           </TouchableOpacity>
 

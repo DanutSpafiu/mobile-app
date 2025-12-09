@@ -152,7 +152,7 @@ const ProfileScreen = ({ onClose }: ProfileScreenProps) => {
         <View style={styles.header}>
           <Text style={styles.headerTitle}>🎄 Your Profile</Text>
           <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-            <Text style={styles.closeButtonText}>✕</Text>
+            <Text style={styles.closeButtonText}>X</Text>
           </TouchableOpacity>
         </View>
 
